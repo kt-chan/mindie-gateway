@@ -1,0 +1,90 @@
+version: '3.8'
+networks:
+  llm-network:
+    driver: bridge
+    
+services:
+  mindie-gateway:
+    build: 
+      context: ../.
+      dockerfile: ./docker/dockerfile
+    image: mindie-gateway
+    container_name: mindie-gateway
+    env_file: .env
+    networks:
+      - llm-network    
+    ports:
+      - "80:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ### This is for testing against vllm and mindie
+    # depends_on:
+    #   vllm:
+    #     condition: service_healthy
+
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: vllm
+    networks:
+      - llm-network
+    ports:
+      - "8000:8000"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - vllm:/root/.cache/modelscope
+    shm_size: 1g
+    env_file: .env
+    environment:
+      - VLLM_USE_MODELSCOPE=true
+    entrypoint:
+      - python3
+      - -m
+      - vllm.entrypoints.openai.api_server
+      - --model=${VLLM_MODEL}
+      - --host=0.0.0.0  # Override to ensure binding to all interfaces
+      - --port=${VLLM_PORT}
+      - --gpu-memory-utilization=${GPU_MEMORY_UTILIZATION}
+      - --max-model-len=${MAX_MODEL_LEN}
+      - --max-num-batched-tokens=${MAX_NUM_BATCHED_TOKENS}
+      - --enable-reasoning
+      - --reasoning-parser=${REASONING_PARSER}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 300s
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+volumes:
+  vllm:
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/demo/projects/data/vllm
