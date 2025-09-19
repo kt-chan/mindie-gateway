@@ -18,7 +18,6 @@ COPY ./conf/api_keys.txt /etc/nginx/api_keys.txt
 
 # Copy Python auth service
 COPY ./gateway/auth_service.py /app/auth_service.py
-COPY ./gateway/app.py /app/app.py
 
 # Copy wrapper script
 COPY ./gateway/start_services.sh /app/start_services.sh
@@ -37,4 +36,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost/health || exit 1
 
 # Use wrapper script to start both services
-CMD ["/app/start_services.sh"]
+CMD ["sh", "/app/start_services.sh"]
