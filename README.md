@@ -1,24 +1,36 @@
-# mindie gateway for api-key validation
+# Project: mindie gateway for api-key validation
 
 MindIE natively do not support API_KEY validation
 this gateway add key validation on top of mindie service
 you should put your api key into this file: api_keys.txt 
 
 
+
+# Setup instruction
+Create api_key.txt file
 ```
 echo e3fd528f06.dYiKQBr0uz3sHAAb295ec84dc797b6440f82d8 >> api_key.txt
 ```
 
+Validate file content
 api_key.txt output checking
 ```
 demo@DESKTOP-OSLI7Q7:~/mindie-gateway$ cat api_keys.txt
 ```
 
-api_key.txt output
+expected output
 ```
 e3fd528f06.dYiKQBr0uz3sHAAb295ec84dc797b6440f82d8
 ```
 
+Setup dockerfile
+```
+ docker-compose up --build -d
+ docker-compose logs -f mindie-gateway
+```
+
+
+# Usage Instruction
 
 ## Valid APK Key, Sample Request follow openai v1/chat/completions api syntax
 ```
