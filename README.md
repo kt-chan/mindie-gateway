@@ -57,9 +57,11 @@ mindie gateway service response:
 
 
 # Testing for debug
+
 ## Valid Key on Mock service
-Add -H "X-Mock-Response: true"  header in curl request
-Sample Request again mock response with -H "X-Mock-Response: true"  header
+
+Add -H "X-Mock-Response: true"  header in curl request. 
+
 ```
 demo@DESKTOP-OSLI7Q7:~/mindie-gateway$ 
 curl -X POST http://localhost/v1/chat/completions   -H "Content-Type: application/json"   -H "Authorization: Bearer e3fd528f06.dYiKQBr0uz3sHAAb295ec84dc797b6440f82d8a" \
@@ -74,7 +76,9 @@ mock response:
 
 
 ## Non Valid Key on Mock service
-Sample Request again mock response with -H "X-Mock-Response: true"  header
+
+Add -H "X-Mock-Response: true"  header in curl request. 
+
 ```
 demo@DESKTOP-OSLI7Q7:~/mindie-gateway$ 
 curl -X POST http://localhost/v1/chat/completions   -H "Content-Type: application/json"   -H "Authorization: Bearer xxxxxxxx.dYiKQBr0uz3sHAAb295ec84dc797b6440f82d8a" \
